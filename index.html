@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CastelManiac V2 - L'Encyclopédie de vos Visites</title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --accent: #f97316;
+            --light: #f3f4f6;
+            --card-bg: #ffffff;
+            --visited: #22c55e;
+            --wishlist: #facc15;
+            --text: #111827;
+            --muted: #6b7280;
+            --border-soft: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--light);
+        }
+
+        .page-wrapper {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 16px 40px 16px;
+        }
+
+        /* HERO pleine largeur, sans gros arrondi / bulle */
+        header {
+            margin: 0 -16px 24px -16px; /* pour coller complètement aux bords */
+        }
+
+        .hero {
+            position: relative;
+            height: 230px;
+            background-image:
+                linear-gradient(
+                    180deg,
+                    rgba(17, 24, 39, 0.35) 0%,
+                    rgba(17, 24, 39, 0.25) 40%,
+                    rgba(17, 24, 39, 0.4) 100%
+                ),
+                url("photopagedegarde.jpg");
+            background-size: cover;
+            background-position: center;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .hero-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            height: 100%;
+            padding: 16px 16px 18px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #f9fafb;
+        }
+
+        .hero-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-title-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-title {
+            margin: 0;
+            font-size: 1.7rem;
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            margin: 2px 0 0 0;
+            font-size: 0.9rem;
+            color: #e5e7eb;
+        }
+
+        .hero-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 620px;
+        }
+
+        .search-box input[type="text"] {
+            width: 100%;
+            padding: 12px 18px 12px 42px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            font-size: 0.95rem;
+            outline: none;
+            background: rgba(15, 23, 42, 0.85);
+            color: #e5e7eb;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.6);
+        }
+
+        .search-box input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-box input:focus {
+            border-color: #bfdbfe;
+            box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.9), 0 6px 18px rgba(15, 23, 42, 0.75);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #9ca3af;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(15, 23, 42, 0.78);
+            color: #e5e7eb;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            padding: 6px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.18s ease, color 0.18s ease, transform 0.15s ease, border-color 0.18s ease;
+        }
+
+        .tab-btn span.icon {
+            font-size: 1rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(15, 23, 42, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .tab-btn.active {
+            background: #f9fafb;
+            color: #111827;
+            border-color: #f9fafb;
+            font-weight: 600;
+        }
+
+        /* CONTENU PRINCIPAL */
+        main {
+            margin-top: 0;
+        }
+
+        .main-block {
+            background: #f9fafb;
+            border-radius: 20px;
+            padding: 20px 20px 26px 20px;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+            margin-top: -12px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .section.active { display: block; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-soft);
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.35rem;
+        }
+
+        .counter {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .counter::before {
+            content: "●";
+            font-size: 0.6rem;
+            color: #22c55e;
+        }
+
+        .castle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+            border-color: rgba(148, 163, 184, 0.8);
+        }
+
+        .card-img {
+            height: 190px;
+            background-color: #e5e7eb;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .card-tag {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(15, 23, 42, 0.85);
+            color: #f9fafb;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+        }
+
+        .status-badges {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.3);
+        }
+
+        .badge-visited { background: var(--visited); color: white; }
+        .badge-wish   { background: var(--wishlist); color: #1f2937; }
+
+        .card-body {
+            padding: 14px 14px 13px 14px;
+        }
+
+        .card-title {
+            margin: 0 0 4px 0;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .card-loc {
+            color: var(--muted);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-loc::before {
+            content: "📍";
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 16px 16px 12px 16px;
+            border-radius: 18px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-label {
+            text-align: center;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+        }
+
+        .stat-big-number {
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 10px 0 6px 0;
+        }
+
+        /* CARTE */
+        #mapSection .section-header h2::before {
+            content: "🗺 ";
+        }
+
+        .map-controls {
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .map-controls button {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #111827;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .map-controls button:hover {
+            background: #e5f0ff;
+        }
+
+        .map-controls button.active {
+            background: var(--primary);
+            color: #f9fafb;
+            border-color: var(--primary);
+        }
+
+        #map {
+            height: 500px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* MODALE */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            display: none;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: #ffffff;
+            width: 90%;
+            max-width: 620px;
+            max-height: 90vh;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
+        }
+
+        .modal-img-header {
+            height: 260px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(17, 24, 39, 0.9);
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            border: none;
+            color: #f9fafb;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-content {
+            padding: 18px 20px 16px 20px;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 4px 0;
+        }
+
+        .modal-content #mLoc {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--muted) !important;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0 16px 0;
+        }
+
+        .tag {
+            background: #eef2ff;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            color: #3730a3;
+        }
+
+        .modal-desc {
+            line-height: 1.5;
+            font-size: 0.9rem;
+            color: #374151;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .action-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 12px;
+        }
+
+        .btn-action {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn-visit {
+            background: #ecfdf5;
+            color: #166534;
+        }
+
+        .btn-visit.active {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-wish {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .btn-wish.active {
+            background: #facc15;
+            color: #78350f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 10px;
+            color: var(--muted);
+            font-style: italic;
+            grid-column: 1 / -1;
+        }
+
+        /* A propos */
+        .about-body {
+            max-width: 800px;
+            font-size: 0.92rem;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .about-body p {
+            margin: 0 0 0.9rem 0;
+        }
+
+        .about-body ul {
+            padding-left: 1.2rem;
+            margin: 0 0 0.9rem 0;
+        }
+
+        .about-body li {
+            margin-bottom: 0.4rem;
+        }
+
+        .about-highlight {
+            background: #eff6ff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 0.5rem 0 1rem 0;
+            font-size: 0.88rem;
+            color: #1e3a8a;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 210px;
+            }
+            .hero-inner {
+                padding: 12px 12px 14px 12px;
+            }
+            .main-block {
+                padding: 16px 14px 22px 14px;
+            }
+            .section-header h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <header>
+        <div class="hero">
+            <div class="hero-inner">
+                <div class="hero-top">
+                    <div class="hero-title-block">
+                        <h1 class="hero-title">Castellarium</h1>
+                        <p class="hero-subtitle">
+                            L'observatoire des châteaux & abbayes
+                        </p>
+                    </div>
+                </div>
+
+                <div class="hero-bottom">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput"
+                               placeholder="Rechercher (ex : Chambord, Fort La Latte, abbaye cistercienne...)"
+                               autocomplete="off">
+                    </div>
+
+                    <div class="nav-tabs">
+                        <button class="tab-btn active" onclick="switchTab('visited')">
+                            <span class="icon">✅</span> Mes Visites
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('wishlist')">
+                            <span class="icon">⭐</span> Ma Liste d'Envie
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('stats')">
+                            <span class="icon">📊</span> Statistiques
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('map')">
+                            <span class="icon">🗺</span> Carte
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('about')">
+                            <span class="icon">ℹ️</span> À propos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="main-block">
+
+            <div id="searchSection" class="section">
+                <div class="section-header">
+                    <h2>Résultats de recherche</h2>
+                </div>
+                <div id="searchList" class="castle-grid"></div>
+            </div>
+
+            <div id="visitedSection" class="section active">
+                <div class="section-header">
+                    <h2>Châteaux visités</h2>
+                    <span class="counter" id="visitedCount">0</span>
+                </div>
+                <div id="visitedList" class="castle-grid"></div>
+            </div>
+
+            <div id="mapSection" class="section">
+                <div class="section-header">
+                    <h2>Carte des châteaux</h2>
+                </div>
+
+                <div class="map-controls">
+                    <button id="btnMapVisited">Châteaux visités</button>
+                    <button id="btnMapAround">Autour de moi</button>
+                </div>
+
+                <div id="map"></div>
+            </div>
+
+            <div id="wishlistSection" class="section">
+                <div class="section-header">
+                    <h2>Ma liste d'envie</h2>
+                    <span class="counter" id="wishCount">0</span>
+                </div>
+                <div id="wishlistList" class="castle-grid"></div>
+            </div>
+
+            <div id="statsSection" class="section">
+                <div class="section-header">
+                    <h2>Analyse de vos explorations</h2>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">TOTAL DÉCOUVERT</div>
+                        <div class="stat-big-number" id="statTotal">0</div>
+                        <p style="text-align: center; margin:0; color:#6b7280; font-size: 0.9rem;">
+                            Châteaux, citadelles & abbayes visités
+                        </p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label" style="margin-bottom: 6px;">VOYAGE DANS LE TEMPS</div>
+                        <canvas id="eraChart"></canvas>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label" style="margin-bottom: 6px;">RÉGIONS / STYLES</div>
+                        <canvas id="styleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION A PROPOS -->
+            <div id="aboutSection" class="section">
+                <div class="section-header">
+                    <h2>À propos de ce site</h2>
+                </div>
+                <div class="about-body">
+                    <p>
+                        Ce site est un projet personnel visant à recenser et à suivre les visites de
+                        <strong>châteaux, citadelles, abbayes et fortifications</strong> en France, et à offrir
+                        un carnet de route visuel aux passionnés de patrimoine.
+                    </p>
+
+                    <div class="about-highlight">
+                        <strong>Données patrimoniales :</strong> les informations de base (titres, localisations,
+                        datations, coordonnées…) proviennent de la
+                        <strong>base Mérimée</strong>, la base de données du patrimoine architectural français
+                        mise à disposition par le <strong>ministère de la Culture</strong> via sa plateforme
+                        d’open data.
+                    </div>
+
+                    <p>
+                        Les notices issues de Mérimée ont été filtrées et transformées pour ne conserver que les
+                        édifices correspondant à l’esprit du projet (châteaux, manoirs, citadelles, forts, abbayes,
+                        monastères, certains sites castraux, etc.)
+                    </p>
+
+                    <p>
+                        La carte interactive est réalisée avec <strong>Leaflet</strong>, en utilisant des fonds de
+                        carte issus de <strong>OpenStreetMap</strong> (ou d’autres fournisseurs compatibles).
+                        Les coordonnées des monuments sont tirées de la colonne WGS84 de la base d’origine.
+                    </p>
+
+                    <p>
+                        Les images de châteaux affichées (vignettes et illustrations) ne sont pas stockées sur ce
+                        site : elles sont chargées dynamiquement depuis
+                        <strong>Wikipedia</strong> et <strong>Wikimedia Commons</strong> via leurs API publiques.
+                        Les droits afférents à ces images restent la propriété de leurs auteurs et des plateformes
+                        correspondantes. En cas de problème sur une image, il convient de se référer à la notice
+                        d’origine sur Wikipedia / Wikimedia Commons.
+                    </p>
+
+                    <p>
+                        Ce site est développé et maintenu par <strong>Q. Rech</strong>, à titre privé.
+                        Il ne constitue en aucun cas un site officiel du ministère de la Culture, ni de
+                        Wikipedia / Wikimedia Commons, ni d’aucune institution patrimoniale. Les éventuelles erreurs de
+                        localisation, de datation ou de description relèvent de la responsabilité de l’auteur du
+                        projet, même si elles proviennent initialement des données sources.
+                    </p>
+
+                    <p>
+                        L’objectif de cette application est de fournir un outil pratique pour :
+                    </p>
+                    <ul>
+                        <li>tenir à jour sa liste de châteaux déjà visités ;</li>
+                        <li>préparer de futures visites grâce à une liste d’envies ;</li>
+                        <li>visualiser ses explorations sur une carte de France ;</li>
+                        <li>avoir un aperçu statistique (périodes historiques, répartition géographique, etc.).</li>
+                    </ul>
+
+                    <p style="font-size:0.85rem; color:#6b7280; margin-top:0.5rem;">
+                        Merci la communauté OpenStreetMap / Wikimedia ainsi qu'aux équipes du ministère de la Culture pour la mise à disposition des données
+                        patrimoniales en open data, constituant un travail
+                        remarquable au service du patrimoine. Contact : quentin.rech37@gmail.com
+                    </p>
+                </div>
+            </div>
+            <!-- Fin section A propos -->
+
+        </div>
+    </main>
+</div>
+
+<!-- Modale -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-img-header" id="mImg">
+            <button class="close-modal" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-content">
+            <h2 id="mTitle">Nom</h2>
+            <div id="mLoc">📍 Localisation</div>
+
+            <div class="tags-container" id="mTags"></div>
+
+            <p class="modal-desc" id="mDesc">Description...</p>
+
+            <div class="action-bar">
+                <button id="btnWish" class="btn-action btn-wish" onclick="toggleWish()">
+                    <span>♥</span> Liste d'envie
+                </button>
+                <button id="btnVisit" class="btn-action btn-visit" onclick="toggleVisit()">
+                    <span>✓</span> Visité
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+<script src="maps.js"></script>
+</body>
+</html>
+
