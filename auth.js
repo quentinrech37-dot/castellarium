@@ -9,7 +9,14 @@ import {
   signOut,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-// Copié de la page Firebase (votre config)
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCXe7vBCucNCJwyPjPwGv1alwXKH2KPq7E",
   authDomain: "castellarium.firebaseapp.com",
@@ -22,8 +29,9 @@ const firebaseConfig = {
 // Initialisation
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db   = getFirestore(app);
 
-// On expose quelques fonctions utiles au reste du code
+// Expose Auth
 window.castellariumAuth = {
   auth,
   signUp(email, password) {
@@ -40,7 +48,32 @@ window.castellariumAuth = {
   },
 };
 
-console.log("Firebase Auth initialisé :", auth);
+// Expose une petite API pour les listes utilisateur
+window.castellariumDB = {
+  db,
+  async loadUserState(uid) {
+    const ref = doc(db, "users", uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      return { visitedIds: [], wishlistIds: [] };
+    }
+    const data = snap.data();
+    return {
+      visitedIds: data.visitedIds || [],
+      wishlistIds: data.wishlistIds || [],
+    };
+  },
+  async saveUserState(uid, visitedIds, wishlistIds) {
+    const ref = doc(db, "users", uid);
+    await setDoc(ref, {
+      visitedIds,
+      wishlistIds,
+      updatedAt: new Date(),
+    }, { merge: true });
+  },
+};
 
-// >>> IMPORTANT : prévenir le reste du code que tout est prêt
+console.log("Firebase (Auth + Firestore) initialisé :", { auth, db });
+
+// Prévenir le reste du code que tout est prêt
 window.dispatchEvent(new Event("castellariumAuthReady"));

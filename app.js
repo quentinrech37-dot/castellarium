@@ -5,11 +5,16 @@
 
 let castlesDB = [];
 
-let visitedIds = (JSON.parse(localStorage.getItem('visitedIds_v2')) || []).map(String);
+let visitedIds  = (JSON.parse(localStorage.getItem('visitedIds_v2'))  || []).map(String);
 let wishlistIds = (JSON.parse(localStorage.getItem('wishlistIds_v2')) || []).map(String);
+
 let currentCastle = null;
 let chartEra = null;
 let chartStyle = null;
+
+// Utilisateur Firebase courant (si connecté)
+let currentUserId = null;
+
 
 // Cache des URLs d’images (clé = id de château)
 const imageCache = new Map();
@@ -171,13 +176,24 @@ function switchTab(tabName) {
 
 
 
-
 function saveData() {
+    // Sauvegarde locale (invités + cache pour les utilisateurs)
     localStorage.setItem('visitedIds_v2', JSON.stringify(visitedIds));
     localStorage.setItem('wishlistIds_v2', JSON.stringify(wishlistIds));
+
     renderVisited();
     renderWishlist();
+
+    // Si un utilisateur est connecté et Firestore dispo → sync serveur
+    if (currentUserId && window.castellariumDB) {
+        window.castellariumDB
+            .saveUserState(currentUserId, visitedIds, wishlistIds)
+            .catch(err => {
+                console.error("Erreur lors de la sauvegarde Firestore :", err);
+            });
+    }
 }
+
 
 // =========================
 // 4. IMAGES (Wikipedia d'abord, Commons ensuite)
@@ -591,3 +607,47 @@ function updateStats() {
 // =========================
 
 document.addEventListener('DOMContentLoaded', init);
+// --- Synchronisation avec Firebase Auth / Firestore ---
+(function attachAuthSync() {
+    // Si auth pas encore prêt, on attend l'événement
+    if (!window.castellariumAuth || !window.castellariumDB) {
+        window.addEventListener("castellariumAuthReady", attachAuthSync, { once: true });
+        return;
+    }
+
+    const { onAuthStateChanged } = window.castellariumAuth;
+
+    onAuthStateChanged(async (user) => {
+        if (!user) {
+            // Déconnexion : on reste sur le contenu localStorage
+            currentUserId = null;
+            console.log("Utilisateur déconnecté, mode local uniquement.");
+            return;
+        }
+
+        currentUserId = user.uid;
+        console.log("Utilisateur connecté, chargement des listes Firestore…");
+
+        try {
+            const remote = await window.castellariumDB.loadUserState(user.uid);
+
+            // On remplace les listes locales par celles du compte
+            visitedIds  = (remote.visitedIds  || []).map(String);
+            wishlistIds = (remote.wishlistIds || []).map(String);
+
+            // On met à jour aussi le localStorage (cache)
+            localStorage.setItem('visitedIds_v2', JSON.stringify(visitedIds));
+            localStorage.setItem('wishlistIds_v2', JSON.stringify(wishlistIds));
+
+            // Et on rafraîchit l’UI
+            renderVisited();
+            renderWishlist();
+            updateStats();
+
+            console.log("Listes chargées depuis Firestore :", remote);
+        } catch (err) {
+            console.error("Erreur lors du chargement Firestore :", err);
+        }
+    });
+})();
+
