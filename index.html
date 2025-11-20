@@ -12,6 +12,50 @@
     />
 
     <style>
+		/* Onglets de la modale d’authentification */
+	.btn-auth-tab {
+    	flex: 1;
+    	border-radius: 999px;
+    	border: 1px solid #dcdde1;
+    	background: #f5f6fa;
+    	padding: 6px 10px;
+    	font-size: 0.85rem;
+    	cursor: pointer;
+    	transition: 0.2s;
+	}
+	.btn-auth-tab.auth-tab-active {
+    	background: var(--primary);
+    	color: white;
+    	border-color: var(--primary);
+	}
+
+	/* Champs de formulaire auth */
+	.auth-form {
+   	display: flex;
+    	flex-direction: column;
+    	gap: 10px;
+    	margin-top: 5px;
+	}
+	.auth-label {
+   	display: flex;
+    	flex-direction: column;
+    	gap: 4px;
+    	font-size: 0.85rem;
+	    color: #34495e;
+	}
+	.auth-label input {
+    	padding: 8px 10px;
+    	border-radius: 6px;
+    	border: 1px solid #dcdde1;
+    	font-size: 0.9rem;
+	}
+	#authMessage {
+   	color: #e74c3c;
+	}
+	#authMessage.auth-success {
+    	color: #27ae60;
+	}
+
         :root {
             --primary: #1d4ed8;
             --accent: #f97316;
@@ -620,6 +664,10 @@
                         <button class="tab-btn" onclick="switchTab('about')">
                             <span class="icon">ℹ️</span> À propos
                         </button>
+			    <button class="tab-btn" id="btnAccount">
+        		👤 Se connecter
+    			</button>
+
                     </div>
                 </div>
             </div>
@@ -788,12 +836,91 @@
         </div>
     </div>
 </div>
+<!-- Modale d’authentification -->
+<div class="modal-overlay" id="authOverlay" style="display:none;">
+    <div class="modal">
+        <div class="modal-content">
+            <button class="close-modal" id="authCloseBtn">✕</button>
+
+            <h2 style="margin: 0 0 5px 0; color: var(--primary);">
+                Mon compte
+            </h2>
+            <p style="color:#7f8c8d; font-size:0.9rem; margin-top:2px;">
+                Connectez-vous pour sauvegarder vos châteaux visités et vos listes d’envie.
+            </p>
+
+            <!-- Onglets Connexion / Inscription -->
+            <div style="display:flex; gap:8px; margin:18px 0 10px 0;">
+                <button id="authTabSignIn" class="btn-auth-tab auth-tab-active">
+                    Connexion
+                </button>
+                <button id="authTabSignUp" class="btn-auth-tab">
+                    Inscription
+                </button>
+            </div>
+
+            <!-- Message d’erreur / info -->
+            <div id="authMessage" style="min-height:1.2em; font-size:0.85rem; margin-bottom:10px;"></div>
+
+            <!-- Formulaire Connexion -->
+            <form id="authFormSignIn" class="auth-form">
+                <label class="auth-label">
+                    Adresse e-mail
+                    <input type="email" id="signinEmail" required autocomplete="email">
+                </label>
+                <label class="auth-label">
+                    Mot de passe
+                    <input type="password" id="signinPassword" required autocomplete="current-password">
+                </label>
+                <button type="submit" class="btn-action btn-visit" id="signinSubmit">
+                    Se connecter
+                </button>
+            </form>
+
+            <!-- Formulaire Inscription -->
+            <form id="authFormSignUp" class="auth-form" style="display:none;">
+                <label class="auth-label">
+                    Adresse e-mail
+                    <input type="email" id="signupEmail" required autocomplete="email">
+                </label>
+                <label class="auth-label">
+                    Mot de passe
+                    <input type="password" id="signupPassword" required autocomplete="new-password">
+                </label>
+                <label class="auth-label">
+                    Confirmer le mot de passe
+                    <input type="password" id="signupPassword2" required autocomplete="new-password">
+                </label>
+                <button type="submit" class="btn-action btn-visit" id="signupSubmit">
+                    Créer mon compte
+                </button>
+            </form>
+
+            <!-- Zone si utilisateur déjà connecté -->
+            <div id="authLoggedInBlock" style="display:none; margin-top:10px;">
+                <p style="font-size:0.9rem; color:#2c3e50;" id="authUserInfo"></p>
+                <button class="btn-action btn-wish" id="btnLogout">
+                    Se déconnecter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Firebase + auth de base (déjà créé) -->
+<script type="module" src="auth.js"></script>
+
+<!-- Logique d’interface pour la connexion / inscription -->
+<script src="auth-ui.js"></script>
+
+<!-- Le reste de l’appli -->
 <script src="app.js"></script>
 <script src="maps.js"></script>
 </body>
 </html>
+
+
 
