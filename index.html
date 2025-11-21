@@ -21,6 +21,22 @@
     />
 
     <style>
+	.section-tools {
+	    display: flex;
+	    align-items: center;
+	    gap: 8px;
+	    font-size: 0.85rem;
+	    color: var(--muted);
+	}
+
+	.sort-label select {
+	    padding: 4px 8px;
+	    border-radius: 999px;
+	    border: 1px solid var(--border-soft);
+	    font-size: 0.85rem;
+	    background: #ffffff;
+	}
+
 		/* Onglets de la modale d’authentification */
 	.btn-auth-tab {
     	flex: 1;
@@ -737,34 +753,40 @@
                 <div id="searchList" class="castle-grid"></div>
             </div>
 
-            <div id="visitedSection" class="section active">
-                <div class="section-header">
-                    <h2>Châteaux visités</h2>
-                    <span class="counter" id="visitedCount">0</span>
-                </div>
-                <div id="visitedList" class="castle-grid"></div>
-            </div>
+	    <div id="visitedSection" class="section active">
+    	    <div class="section-header">
+	            <h2>Châteaux visités</h2>
+	            <div class="section-tools">
+	                <label class="sort-label">
+	                    Trier :
+	                    <select id="visitedSortSelect">
+	                        <option value="alpha">A → Z</option>
+	                        <option value="century">Siècle</option>
+	                        <option value="region">Région</option>
+	                    </select>
+	                </label>
+	            </div>
+	        </div>
+	        <div id="visitedList" class="castle-grid"></div>
+	    </div>
 
-            <div id="mapSection" class="section">
-                <div class="section-header">
-                    <h2>Carte des châteaux</h2>
-                </div>
+	    <div id="wishlistSection" class="section">
+	        <div class="section-header">
+	            <h2>Ma liste d'envie</h2>
+	            <div class="section-tools">
+	                <label class="sort-label">
+	                    Trier :
+	                    <select id="wishlistSortSelect">
+	                        <option value="alpha">A → Z</option>
+	                        <option value="century">Siècle</option>
+	                        <option value="region">Région</option>
+	                    </select>
+	                </label>
+	            </div>
+	        </div>
+	        <div id="wishlistList" class="castle-grid"></div>
+	    </div>
 
-                <div class="map-controls">
-                    <button id="btnMapVisited">Châteaux visités</button>
-                    <button id="btnMapAround">Autour de moi</button>
-                </div>
-
-                <div id="map"></div>
-            </div>
-
-            <div id="wishlistSection" class="section">
-                <div class="section-header">
-                    <h2>Ma liste d'envie</h2>
-                    <span class="counter" id="wishCount">0</span>
-                </div>
-                <div id="wishlistList" class="castle-grid"></div>
-            </div>
 
             <div id="statsSection" class="section">
                 <div class="section-header">
@@ -789,6 +811,10 @@
                         <div class="stat-label" style="margin-bottom: 6px;">RÉGIONS / STYLES</div>
                         <canvas id="styleChart"></canvas>
                     </div>
+		    <div class="stat-card">
+            	        <div class="stat-label" style="margin-bottom: 6px;">TYPES DE SITES</div>
+            	        <canvas id="typeChart"></canvas>
+        	    </div>
                 </div>
             </div>
 
