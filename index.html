@@ -617,21 +617,65 @@
             from { opacity: 0; transform: translateY(4px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+/* Mise en page optimisée pour les écrans étroits */
+	@media (max-width: 768px) {
+	    /* Le header s’adapte à la hauteur du contenu */	
+	    .hero {
+	        height: auto;
+	        min-height: 230px;
+	    }
 
-        @media (max-width: 768px) {
-            .hero {
-                height: 210px;
-            }
-            .hero-inner {
-                padding: 12px 12px 14px 12px;
-            }
-            .main-block {
-                padding: 16px 14px 22px 14px;
-            }
-            .section-header h2 {
-                font-size: 1.2rem;
-            }
-        }
+	    .hero-inner {
+	        padding: 10px 10px 14px 10px;
+	    }
+
+	    .hero-title {
+	        font-size: 1.6rem;
+	        line-height: 1.1;
+	    }
+
+	    .hero-subtitle {
+	        font-size: 0.8rem;
+	    }
+
+	    .main-block {
+	        padding: 14px 10px 20px 10px;
+	        margin-top: -6px;
+	    }
+
+	    .section-header h2 {
+        font-size: 1.15rem;
+	    }
+
+	    /* Champ de recherche un peu plus compact */
+	    .search-box input[type="text"] {
+	        font-size: 0.85rem;
+	        padding: 10px 14px 10px 38px;
+	    }
+
+	    /* Les onglets se mettent sur plusieurs lignes */
+	    .nav-tabs {
+	        flex-wrap: wrap;
+	        justify-content: center;
+	        gap: 6px;
+	    }
+
+	    /* Chaque bouton occupe environ la moitié de la largeur */
+	    .tab-btn {
+	        flex: 1 1 calc(50% - 8px);
+	        max-width: calc(50% - 8px);
+	        font-size: 0.8rem;
+	        padding: 8px 6px;
+	    }
+
+	    /* Le bouton "Se connecter" sur toute la largeur */
+	    #btnAccount {
+ 	       flex-basis: 100%;
+ 	       max-width: 100%;
+	    }
+	}
+
+        
     </style>
 </head>
 <body>
