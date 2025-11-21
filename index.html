@@ -754,12 +754,13 @@
             </div>
 
 	    <div id="visitedSection" class="section active">
-    	    <div class="section-header">
+	        <div class="section-header">
 	            <h2>Châteaux visités</h2>
 	            <div class="section-tools">
+	                <span class="counter" id="visitedCount">0</span>
 	                <label class="sort-label">
 	                    Trier :
-	                    <select id="visitedSortSelect">
+	                    <select id="sortVisited">
 	                        <option value="alpha">A → Z</option>
 	                        <option value="century">Siècle</option>
 	                        <option value="region">Région</option>
@@ -770,13 +771,15 @@
 	        <div id="visitedList" class="castle-grid"></div>
 	    </div>
 
+
 	    <div id="wishlistSection" class="section">
 	        <div class="section-header">
 	            <h2>Ma liste d'envie</h2>
 	            <div class="section-tools">
+	                <span class="counter" id="wishCount">0</span>
 	                <label class="sort-label">
 	                    Trier :
-	                    <select id="wishlistSortSelect">
+	                    <select id="sortWishlist">
 	                        <option value="alpha">A → Z</option>
 	                        <option value="century">Siècle</option>
 	                        <option value="region">Région</option>
@@ -786,6 +789,7 @@
 	        </div>
 	        <div id="wishlistList" class="castle-grid"></div>
 	    </div>
+
 
 
             <div id="statsSection" class="section">
