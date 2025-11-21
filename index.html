@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#1d4ed8">
+
+    <!-- iOS PWA compatibility -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CastelManiac V2 - L'Encyclopédie de vos Visites</title>
@@ -919,6 +928,14 @@
 <!-- Le reste de l’appli -->
 <script src="app.js"></script>
 <script src="maps.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log("Service Worker enregistré"))
+    .catch((e) => console.error("Erreur SW", e));
+}
+</script>
+
 </body>
 </html>
 
