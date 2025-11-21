@@ -21,22 +21,6 @@
     />
 
     <style>
-	.section-tools {
-	    display: flex;
-	    align-items: center;
-	    gap: 8px;
-	    font-size: 0.85rem;
-	    color: var(--muted);
-	}
-
-	.sort-label select {
-	    padding: 4px 8px;
-	    border-radius: 999px;
-	    border: 1px solid var(--border-soft);
-	    font-size: 0.85rem;
-	    background: #ffffff;
-	}
-
 		/* Onglets de la modale d’authentification */
 	.btn-auth-tab {
     	flex: 1;
@@ -633,65 +617,21 @@
             from { opacity: 0; transform: translateY(4px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-/* Mise en page optimisée pour les écrans étroits */
-	@media (max-width: 768px) {
-	    /* Le header s’adapte à la hauteur du contenu */	
-	    .hero {
-	        height: auto;
-	        min-height: 230px;
-	    }
 
-	    .hero-inner {
-	        padding: 10px 10px 14px 10px;
-	    }
-
-	    .hero-title {
-	        font-size: 1.6rem;
-	        line-height: 1.1;
-	    }
-
-	    .hero-subtitle {
-	        font-size: 0.8rem;
-	    }
-
-	    .main-block {
-	        padding: 14px 10px 20px 10px;
-	        margin-top: -6px;
-	    }
-
-	    .section-header h2 {
-        font-size: 1.15rem;
-	    }
-
-	    /* Champ de recherche un peu plus compact */
-	    .search-box input[type="text"] {
-	        font-size: 0.85rem;
-	        padding: 10px 14px 10px 38px;
-	    }
-
-	    /* Les onglets se mettent sur plusieurs lignes */
-	    .nav-tabs {
-	        flex-wrap: wrap;
-	        justify-content: center;
-	        gap: 6px;
-	    }
-
-	    /* Chaque bouton occupe environ la moitié de la largeur */
-	    .tab-btn {
-	        flex: 1 1 calc(50% - 8px);
-	        max-width: calc(50% - 8px);
-	        font-size: 0.8rem;
-	        padding: 8px 6px;
-	    }
-
-	    /* Le bouton "Se connecter" sur toute la largeur */
-	    #btnAccount {
- 	       flex-basis: 100%;
- 	       max-width: 100%;
-	    }
-	}
-
-        
+        @media (max-width: 768px) {
+            .hero {
+                height: 210px;
+            }
+            .hero-inner {
+                padding: 12px 12px 14px 12px;
+            }
+            .main-block {
+                padding: 16px 14px 22px 14px;
+            }
+            .section-header h2 {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -753,44 +693,34 @@
                 <div id="searchList" class="castle-grid"></div>
             </div>
 
-	    <div id="visitedSection" class="section active">
-	        <div class="section-header">
-	            <h2>Châteaux visités</h2>
-	            <div class="section-tools">
-	                <span class="counter" id="visitedCount">0</span>
-	                <label class="sort-label">
-	                    Trier :
-	                    <select id="sortVisited">
-	                        <option value="alpha">A → Z</option>
-	                        <option value="century">Siècle</option>
-	                        <option value="region">Région</option>
-	                    </select>
-	                </label>
-	            </div>
-	        </div>
-	        <div id="visitedList" class="castle-grid"></div>
-	    </div>
+            <div id="visitedSection" class="section active">
+                <div class="section-header">
+                    <h2>Châteaux visités</h2>
+                    <span class="counter" id="visitedCount">0</span>
+                </div>
+                <div id="visitedList" class="castle-grid"></div>
+            </div>
 
+            <div id="mapSection" class="section">
+                <div class="section-header">
+                    <h2>Carte des châteaux</h2>
+                </div>
 
-	    <div id="wishlistSection" class="section">
-	        <div class="section-header">
-	            <h2>Ma liste d'envie</h2>
-	            <div class="section-tools">
-	                <span class="counter" id="wishCount">0</span>
-	                <label class="sort-label">
-	                    Trier :
-	                    <select id="sortWishlist">
-	                        <option value="alpha">A → Z</option>
-	                        <option value="century">Siècle</option>
-	                        <option value="region">Région</option>
-	                    </select>
-	                </label>
-	            </div>
-	        </div>
-	        <div id="wishlistList" class="castle-grid"></div>
-	    </div>
+                <div class="map-controls">
+                    <button id="btnMapVisited">Châteaux visités</button>
+                    <button id="btnMapAround">Autour de moi</button>
+                </div>
 
+                <div id="map"></div>
+            </div>
 
+            <div id="wishlistSection" class="section">
+                <div class="section-header">
+                    <h2>Ma liste d'envie</h2>
+                    <span class="counter" id="wishCount">0</span>
+                </div>
+                <div id="wishlistList" class="castle-grid"></div>
+            </div>
 
             <div id="statsSection" class="section">
                 <div class="section-header">
@@ -815,10 +745,6 @@
                         <div class="stat-label" style="margin-bottom: 6px;">RÉGIONS / STYLES</div>
                         <canvas id="styleChart"></canvas>
                     </div>
-		    <div class="stat-card">
-            	        <div class="stat-label" style="margin-bottom: 6px;">TYPES DE SITES</div>
-            	        <canvas id="typeChart"></canvas>
-        	    </div>
                 </div>
             </div>
 
