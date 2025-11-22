@@ -909,15 +909,20 @@
             <div class="tags-container" id="mTags"></div>
 
             <p class="modal-desc" id="mDesc">Description...</p>
-	    <div id="mVideoContainer" class="video-container" style="display:none;">
-	        <iframe
-	            id="mVideo"
-	            src=""
-	            title="Vidéo du château"
-	            loading="lazy"
-	            allowfullscreen
-	            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-	        </iframe>
+	    
+	    <!-- Vidéo associée au château (si disponible) -->
+	    <div id="mVideoContainer" style="display:none; margin-top:12px;">
+	        <div style="font-size:0.9rem; color:#4b5563; margin-bottom:6px;">
+	            🎬 Vidéo associée
+	        </div>
+	        <div style="position:relative; padding-top:56.25%; border-radius:12px; overflow:hidden; background:#000;">
+	            <iframe
+	                id="mVideo"
+	                src=""
+	                allowfullscreen
+	                style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;">
+	            </iframe>
+	        </div>
 	    </div>
 
             <div class="action-bar">

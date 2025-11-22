@@ -466,38 +466,41 @@ function handleSearchValue(value) {
 function openModal(c) {
     currentCastle = c;
 
+    // Titre
     document.getElementById('mTitle').textContent = c.name;
-    document.getElementById('mLoc').textContent =
-        `📍 ${c.commune} · ${c.departement} · ${c.region}`;
 
-    // Tags
+    // Localisation : on utilise la chaîne déjà préparée
+    document.getElementById('mLoc').textContent =
+        `📍 ${c.location || 'Localisation inconnue'}`;
+
+    // Tags (siècles et région)
     const tagsDiv = document.getElementById('mTags');
     tagsDiv.innerHTML = '';
 
-    if (c.siecles && c.siecles.trim() !== '') {
+    if (c.era && c.era.trim() !== '') {
         const t = document.createElement('span');
         t.className = 'tag';
-        t.textContent = c.siecles;
+        t.textContent = c.era;
         tagsDiv.appendChild(t);
     }
 
-    if (c.region) {
+    if (c.style && c.style.trim() !== '') {
         const t = document.createElement('span');
         t.className = 'tag';
-        t.textContent = c.region;
+        t.textContent = c.style;
         tagsDiv.appendChild(t);
     }
 
     // Description
-    const desc = c.resume || "Aucun résumé disponible.";
-    document.getElementById('mDesc').textContent = desc;
+    document.getElementById('mDesc').textContent =
+        c.desc || "Aucun résumé disponible.";
 
     // --- Vidéo éventuelle ---
     const videoContainer = document.getElementById('mVideoContainer');
     const videoIframe    = document.getElementById('mVideo');
 
     if (videoContainer && videoIframe) {
-        const lien = c.raw && c.raw.lien_video;
+        const lien = c.raw && c.raw.lien_video;   // pris dans l’objet brut du JSON
 
         if (lien) {
             // Conversion éventuelle YouTube -> URL d'embed
@@ -518,8 +521,10 @@ function openModal(c) {
     // Boutons
     updateModalButtons();
 
+    // Afficher la modale
     document.getElementById('modalOverlay').style.display = 'flex';
 }
+
 
 function closeModal() {
     document.getElementById('modalOverlay').style.display = 'none';
