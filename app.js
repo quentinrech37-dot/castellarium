@@ -465,6 +465,19 @@ function handleSearchValue(value) {
 
 function openModal(c) {
     currentCastle = c;
+    // Image d’en-tête de la fiche
+    const headerDiv = document.getElementById('mImg');
+    headerDiv.style.backgroundImage = '';
+
+    // On réutilise le cache d’images (évite de refaire des requêtes)
+    const cachedUrl = imageCache.get(String(c.id));
+    if (cachedUrl) {
+        headerDiv.style.backgroundImage = `url('${cachedUrl}')`;
+    } else {
+        // Si le château n’a pas encore d’image en cache, on en cherche une
+        loadImageForCastle(c, headerDiv);
+    }
+
 
     // Titre
     document.getElementById('mTitle').textContent = c.name;
