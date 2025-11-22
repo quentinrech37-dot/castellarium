@@ -481,16 +481,20 @@
         }
 
         .modal {
-            background: #ffffff;
-            width: 90%;
-            max-width: 620px;
-            max-height: 90vh;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
-        }
+	    background: #ffffff;
+	    width: 90%;
+	    max-width: 620px;
+	    max-height: 90vh;
+	    border-radius: 20px;
+	    /* on laisse seulement l’overflow horizontal caché,
+	       mais on autorise le scroll vertical */
+	    overflow-x: hidden;
+	    overflow-y: auto;
+	    display: flex;
+	    flex-direction: column;
+	    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
+	}
+
 
         .modal-img-header {
             height: 260px;
@@ -514,7 +518,7 @@
         }
 
         .modal-content {
-            padding: 18px 20px 16px 20px;
+            padding: 18px 20px 20px 20px;
         }
 
         .modal-content h2 {
