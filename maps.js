@@ -7,25 +7,25 @@ let visitedLayer = null;
 let aroundLayer = null;
 
 // ---------- utilitaire : récupérer lat/lon d'un château ----------
-
 function getCastleLatLon(castle) {
     if (!castle) return null;
 
-    // cas 1 : coordonnees au niveau racine
-    let coord = castle.coordonnees;
-
-    // cas 2 : coordonnees dans raw
-    if (!coord && castle.raw && castle.raw.coordonnees) {
-        coord = castle.raw.coordonnees;
+    // FORMAT ACTUEL (ton app.js génère ceci)
+    if (castle.coord && typeof castle.coord.lat === "number") {
+        return { lat: castle.coord.lat, lon: castle.coord.lon };
     }
 
-    if (!coord) return null;
-    const lat = parseFloat(coord.lat);
-    const lon = parseFloat(coord.lon);
+    // FORMAT ANCIEN (au cas où…)
+    if (castle.raw && castle.raw.coordonnees) {
+        return {
+            lat: parseFloat(castle.raw.coordonnees.lat),
+            lon: parseFloat(castle.raw.coordonnees.lon)
+        };
+    }
 
-    if (Number.isNaN(lat) || Number.isNaN(lon)) return null;
-    return { lat, lon };
+    return null;
 }
+
 
 // ---------- initialisation de la carte ----------
 
