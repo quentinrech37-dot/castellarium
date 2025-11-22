@@ -551,6 +551,20 @@
             margin-bottom: 16px;
         }
 
+	.video-container {
+	    margin-top: 12px;
+	    border-radius: 12px;
+	    overflow: hidden;
+	    background: #000;
+	    max-height: 260px;
+	}
+
+	.video-container iframe {
+	    width: 100%;
+	    height: 220px;
+	    border: none;
+	}
+
         .action-bar {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -895,6 +909,16 @@
             <div class="tags-container" id="mTags"></div>
 
             <p class="modal-desc" id="mDesc">Description...</p>
+	    <div id="mVideoContainer" class="video-container" style="display:none;">
+	        <iframe
+	            id="mVideo"
+	            src=""
+	            title="Vidéo du château"
+	            loading="lazy"
+	            allowfullscreen
+	            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+	        </iframe>
+	    </div>
 
             <div class="action-bar">
                 <button id="btnWish" class="btn-action btn-wish" onclick="toggleWish()">
