@@ -89,28 +89,9 @@ async function loadCastlesFromMerimee() {
     });
 }
 
-
 // =========================
 // 2. INIT
 // =========================
-
-async function init() {
-    try {
-        await loadCastlesFromMerimee();
-    } catch (e) {
-        console.error(e);
-        alert("Erreur lors du chargement de chateaux.json");
-        return;
-    }
-// NOUVEAU : remplir la page Découvrir dès le début
-    renderDiscover();
-
-    renderVisited();
-    renderWishlist();
-    updateStats();
-
-    const searchInput = document.getElementById('searchInput');
-    let searchTimeout = null;
 
 // Retourne un sous-ensemble aléatoire de l'array, sans répétition
 function getRandomSubset(array, n) {
@@ -124,14 +105,6 @@ function getRandomSubset(array, n) {
         copy.splice(idx, 1);
     }
     return result;
-    const btnRefreshDiscover = document.getElementById('btnRefreshDiscover');
-    if (btnRefreshDiscover) {
-        btnRefreshDiscover.addEventListener('click', () => {
-            renderDiscover();
-            // on reste sur l’onglet "Découvrir"
-            switchTab('discover');
-        });
-    }
 }
 
 function renderDiscover() {
@@ -140,25 +113,49 @@ function renderDiscover() {
 
     container.innerHTML = '';
 
-    // Par exemple 12 châteaux aléatoires
+    // Exemple : 12 châteaux au hasard
     const sample = getRandomSubset(castlesDB, 12);
     sample.forEach(c => container.appendChild(createCard(c, true)));
 }
 
+async function init() {
+    try {
+        await loadCastlesFromMerimee();
+    } catch (e) {
+        console.error(e);
+        alert("Erreur lors du chargement de chateaux.json");
+        return;
+    }
+
+    // Découvrir : remplir dès le début
+    renderDiscover();
+
+    // Bouton “Nouvelles propositions”
+    const btnRefreshDiscover = document.getElementById('btnRefreshDiscover');
+    if (btnRefreshDiscover) {
+        btnRefreshDiscover.addEventListener('click', () => {
+            renderDiscover();
+            switchTab('discover');
+        });
+    }
+
+    // Rendu initial
     renderVisited();
     renderWishlist();
     updateStats();
 
+    // Recherche (debounce 200 ms)
     const searchInput = document.getElementById('searchInput');
-    let searchTimeout = null;
-
-    searchInput.addEventListener('input', (e) => {
-        const value = e.target.value;
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            handleSearchValue(value);
-        }, 200); // on attend 200 ms avant de lancer la recherche
-    });
+    if (searchInput) {
+        let searchTimeout = null;
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                handleSearchValue(value);
+            }, 200);
+        });
+    }
 }
 
 // =========================
